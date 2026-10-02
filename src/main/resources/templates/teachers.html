@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity">
+<head>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/teachers.css}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+
+<div class="main-content">
+    <h1 class="page-title">Teachers Management</h1>
+
+    <div sec:authorize="hasAuthority('INSERT_TEACHER')" class="action-buttons">
+        <a th:href="@{/teachers/insert}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Insert Teacher
+        </a>
+    </div>
+
+    <div th:if="${errorMessage}" class="error">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <table sec:authorize="hasAuthority('VIEW_TEACHERS')">
+<!--    <table>-->
+        <thead>
+        <tr>
+<!--                <th>ID</th>-->
+            <th>UUID</th>
+            <th>Firstname</th>
+            <th>Lastname</th>
+            <th>VAT</th>
+            <th>Region</th>
+            <th sec:authorize="hasAnyAuthority('EDIT_TEACHER', 'DELETE_TEACHER')">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+<!--        sec:authorize="hasRole('ADMIN')-->
+        <!-- Iterate over the content of the current page -->
+        <tr th:each="teacher : ${teachers}">
+<!--                <td th:text="${teacher.id}"></td>-->
+            <td th:text="${teacher.uuid}"></td>
+            <td th:text="${teacher.firstname}"></td>
+            <td th:text="${teacher.lastname}"></td>
+            <td th:text="${teacher.vat}"></td>
+            <td th:text="${teacher.region}"></td>
+            <td>
+                <a sec:authorize="hasAuthority('EDIT_TEACHER')"
+                   th:href="@{/teachers/edit/{uuid}(uuid=${teacher.uuid})}"
+                   class="btn btn-sm btn-outline-primary"
+                >Edit
+                </a>
+                <form sec:authorize="hasAuthority('DELETE_TEACHER')"
+                      th:action="@{/teachers/delete/{uuid}(uuid=${teacher.uuid})}"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Delete?')"
+                >
+                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<div class="pagination-controls">
+    <a th:if="${!page.first}" th:href="@{/teachers(page=0, size=${page.size})}">&laquo; First</a>
+    <span th:if="${page.first}" class="disabled">&laquo; First</span>
+
+    <a th:if="${!page.first}" th:href="@{/teachers(page=${page.number - 1}, size=${page.size})}">&lsaquo; Prev</a>
+    <span th:if="${page.first}" class="disabled">&lsaquo; Prev</span>
+
+    <span th:text="${page.number + 1} + ' / ' + ${page.totalPages}"></span>
+
+    <a th:if="${!page.last}" th:href="@{/teachers(page=${page.number + 1}, size=${page.size})}">Next &rsaquo;</a>
+    <span th:if="${page.last}" class="disabled">Next &rsaquo;</span>
+
+    <a th:if="${!page.last}" th:href="@{/teachers(page=${page.totalPages - 1}, size=${page.size})}">Last &raquo;</a>
+    <span th:if="${page.last}" class="disabled">Last &raquo;</span>
+</div>
+
+
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
